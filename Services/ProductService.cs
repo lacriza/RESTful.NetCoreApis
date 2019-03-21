@@ -13,7 +13,6 @@ namespace SupermarketApiRest.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
 
         public ProductService(IUnitOfWork unitOfWork, IProductRepository productRepository)
         {
@@ -37,15 +36,15 @@ namespace SupermarketApiRest.Services
             }
         }
 
-        public async Task<ProductResponse> UpdateAsync(int id, Product product, string categoryId)
+        public async Task<ProductResponse> UpdateAsync(int id, Product product, int categoryId)
         {
             var existingProduct = await _productRepository.FindByIdAsync(id);
             if (existingProduct == null) return new ProductResponse("Product not found");
             existingProduct.Name = product.Name;
             existingProduct.UnitOfMeasurement = product.UnitOfMeasurement;
             existingProduct.QuantityInPackage = product.QuantityInPackage;
-            //todo: implement update category in product
-
+            existingProduct.CategoryId = categoryId;
+           
             try
             {
                 _productRepository.Update(product);
