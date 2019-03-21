@@ -31,8 +31,12 @@ namespace SupermarketApiRest
             });
 
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            
             services.AddAutoMapper();
         }
 
