@@ -13,11 +13,16 @@ namespace SupermarketApiRest.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public ProductService(IUnitOfWork unitOfWork, IProductRepository productRepository)
+        public ProductService(
+            IUnitOfWork unitOfWork, 
+            IProductRepository productRepository,
+            ICategoryRepository categoryRepository)
         {
             _unitOfWork = unitOfWork;
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task<IEnumerable<Product>> ListAsync() => await _productRepository.ListAsync();
@@ -36,19 +41,22 @@ namespace SupermarketApiRest.Services
             }
         }
 
-        public async Task<ProductResponse> UpdateAsync(int id, Product product, int categoryId)
+        public async Task<ProductResponse> UpdateAsync(int id, Product product)
         {
             var existingProduct = await _productRepository.FindByIdAsync(id);
             if (existingProduct == null) return new ProductResponse("Product not found");
+            var existingCategory = await _categoryRepository.FindByIdAsync(product.CategoryId);
+            if(existingCategory == null) return new ProductResponse("Invalid category");
+           
             existingProduct.Name = product.Name;
             existingProduct.UnitOfMeasurement = product.UnitOfMeasurement;
             existingProduct.QuantityInPackage = product.QuantityInPackage;
-            existingProduct.CategoryId = categoryId;
-           
+            existingProduct.CategoryId = product.CategoryId;
             try
             {
                 _productRepository.Update(product);
                 await _unitOfWork.CompleteAsync();
+                
                 return new ProductResponse(existingProduct);
             }
             catch (Exception e)

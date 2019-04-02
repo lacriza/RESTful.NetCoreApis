@@ -41,5 +41,33 @@ namespace SupermarketApiRest.Controllers
             var productResource = _mapper.Map<Product, ProductResource>(result.Product);
             return Ok(productResource);              
         }
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAsync(int id, [FromBody] SaveProductResource resource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.GetErrorMesages());
+
+            var product = _mapper.Map<SaveProductResource, Product>(resource);
+            var result = await _productService.UpdateAsync(id, product);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            var productResource = _mapper.Map<Product, ProductResource>(result.Product);
+            return Ok(productResource);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _productService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            var categoryResource = _mapper.Map<Product, ProductResource>(result.Product);
+            return Ok(categoryResource);
+        }
     }
 }
